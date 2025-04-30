@@ -1,0 +1,118 @@
+# Create the install.sh 
+nano install.sh
+
+# Installation command
+sudo apt-get update
+sudo apt-get install docker.io -y
+sudo systemctl enable --now docker
+sudo swapoff -a
+sudo apt-get install -y apt-transport-https ca-certificates curl gpg
+sudo mkdir -p -m 755 /etc/apt/keyrings
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+sudo apt-get update
+sudo apt-get install -y kubelet kubeadm kubectl
+sudo systemctl enable --now kubelet
+
+# Run the bash command
+
+bash install.sh
+
+# Initialize the Kubeadm
+sudo kubeadm init
+
+# Paste this command to the home directory
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+# Paste these token command to Slave1 & Slave2 (It's different for you)
+kubeadm join 172.31.10.143:6443 - token julbp8.6qlh2ha13nkb30lg \
+ - discovery-token-ca-cert-hash sha256:661b9935ffce1ab2f9bac23ac58acec8a746262b3ef321d571734b73496217b4
+  
+# Set up the Calico Network
+
+curl https://raw.githubusercontent.com/projectcalico/calico/v3.27.2/manifests/calico.yaml -O
+sudo swapoff -a
+ls
+kubectl apply -f calico.yaml
+
+# Create a deployment.yaml file
+sudo nano deployment.yaml file
+# Paste the given code to the deployment.yaml file
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+name: nginx-deployment
+spec:
+selector:
+matchLabels:
+app: nginx
+replicas: 3
+template:
+metadata:
+labels:
+app: nginx
+spec:
+containers:
+- name: nginx
+image: nginx:1.16.1 # Update the version of nginx from 1.14.2 to 1.16.1
+ports:
+- containerPort: 80
+# Run the deployment.yaml file using the below-given command:
+kubectl apply –f deployment.yaml
+# To check the deployments:
+kubectl get deploy
+# To check the pods
+kubectl get pods
+# Kubernetes-Assignment-1
+How to Deploy a Kubernetes Cluster &amp; Create 3 Replica of Nginx Deployment - Kubernetes Assignment 1
+
+**For the detailed solution to this assignment, click this link:** https://medium.com/devops-guides/how-to-deploy-a-kubernetes-cluster-create-three-replica-of-nginx-deployment-kubernetes-assignment-1-6643342cc998
+
+**Step 1:** Install the Docker & Kubernetes using the script file.
+
+**Step 2:** Initialize the kubeadm 
+
+**Step 3:** Paste the first command to the home directory
+
+**Step 4:** Paste the second command to both slave nodes with root access. Both nodes will join the cluster successfully.
+
+**Step 5:** A Kubernetes Cluster Deployment will be successfully formed.
+
+**Step 6:** Create a deployment.yaml file & paste the deployment script which creates 3 replicas.
+
+**Step 7:** Run the deployment.yaml file & deployment with three replicas will be successfully created.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.16.1
+        ports:
+        - containerPort: 80
+
+sudo apt-get update
+sudo apt-get install docker.io -y
+sudo systemctl enable --now docker
+sudo swapoff -a
+sudo apt-get install -y apt-transport-https ca-certificates curl gpg
+sudo mkdir -p -m 755 /etc/apt/keyrings
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+sudo apt-get update
+sudo apt-get install -y kubelet kubeadm kubectl
+sudo systemctl enable --now kubelet
